@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 class ImageViewer(QtGui.QWidget):
     def __init__(self, *args):
