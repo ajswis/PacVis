@@ -12,5 +12,6 @@ Libraries Used
 
 To-Do
 -----
+* Rename variables to shorter, more concise names.
 * Cleanly stop all running processes when the GUI closes or upon shutdown.
 * Automatically detect wether scapy needs to parse radiotap headers to find ARP messages or if it can do so by applying a filter (applying a filter while capturing on an interface in monitor mode causes scapy to crash and hang).
