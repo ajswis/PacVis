@@ -48,7 +48,7 @@ def start():
 
     build_rt_graph = Process(target=_update_graph,
             args=(True,'realtime',_interval))
-    build_at_graph = Process(target=_update_graph, args=(False,'alltime',6))
+    build_at_graph = Process(target=_update_graph, args=(False,'alltime',60))
     parse_tcp = Process(target=_parse_finished_tcp)
     build_rt_graph.start()
     build_at_graph.start()
