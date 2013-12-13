@@ -28,10 +28,14 @@ class PacVisMainWidget(QtGui.QWidget):
         self.initUI()
 
         timer = QtCore.QTimer(self)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.update_pic)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.update_filename)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.update_dns)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.update_arp)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"),
+                self.update_pic)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"),
+                self.update_filename)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"),
+                self.update_dns)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"),
+                self.update_arp)
         timer.start(250)
 
     def initUI(self):

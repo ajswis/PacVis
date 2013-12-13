@@ -28,7 +28,8 @@ class PacVisMainWindow(QtGui.QMainWindow):
 
     def handle_new_graph_window(self):
         window = QtGui.QMainWindow(self)
-        window.setCentralWidget(RealtimeGraphVisualizer(self.rt_graphs, self.at_graph))
+        window.setCentralWidget(RealtimeGraphVisualizer(self.rt_graphs,
+                self.at_graph))
         window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         window.setWindowTitle('PacVis Realtime Graphic Display')
         window.setMinimumSize(900, 600)

@@ -16,7 +16,8 @@ class DNSHistogram(FigureCanvas):
         FigureCanvas.updateGeometry(self)
 
         timer = QtCore.QTimer(self)
-        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"), self.update_figure)
+        QtCore.QObject.connect(timer, QtCore.SIGNAL("timeout()"),
+                self.update_figure)
         timer.start(5000) # milliseconds
         self.update_figure()
 

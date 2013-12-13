@@ -57,30 +57,10 @@ class RealtimeGraphVisualizer(QtGui.QWidget):
                 self.display_stored_image)
 
     def init_image_display(self):
-        #resolution = QtGui.QDesktopWidget().screenGeometry()
-        #pbar = QtGui.QProgressBar()
-
-        #window = QtGui.QMainWindow(self)
-        #window.setCentralWidget(pbar)
-        #window.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        #window.resize(300, 40)
-        #window.move((resolution.width() / 2) - (window.frameSize().width() / 2),
-                #(resolution.height() / 2) - (window.frameSize().height() / 2))
-        #window.show()
-
         rt_graphs = self.rt_graphs.dict
         for k in rt_graphs.keys():
             self.graph_list.insertItem(0, QtGui.QListWidgetItem(k))
             self.last_rt_graph = k
-        #pbar.setRange(0, len(rt_graphs)+1)
-        #for k,v in rt_graphs.iteritems():
-            #image = QtGui.QImage.fromData(v)
-            #pixmap = QtGui.QPixmap().fromImage(image)
-            #if not pixmap.isNull():
-                #self.rt_graph_images.insert(0, pixmap)
-                #self.graph_list.insertItem(0, QtGui.QListWidgetItem(k))
-                #self.last_rt_graph = k
-            #pbar.setValue(rt_graphs.keys().index(k))
         if self.last_rt_graph != '':
             image = QtGui.QImage.fromData(rt_graphs[self.last_rt_graph])
             pixmap = QtGui.QPixmap().fromImage(image)
@@ -94,11 +74,9 @@ class RealtimeGraphVisualizer(QtGui.QWidget):
             if not pixmap.isNull():
                 self.at_graph_image = pixmap
                 self.last_at_graph = time
-            #pbar.setValue(len(rt_graphs)+1)
         except ValueError:
             # Nothing was in stored in self.at_graph.graph yet.
             pass
-        #window.close()
 
     def check_new_images(self):
         rt_graphs = self.rt_graphs.dict
@@ -114,16 +92,6 @@ class RealtimeGraphVisualizer(QtGui.QWidget):
                 self.last_rt_graph = k
                 while self.graph_list.count() > 200:
                     self.graph_list.takeItem(200)
-                #image = QtGui.QImage.fromData(v)
-                #pixmap = QtGui.QPixmap().fromImage(image)
-                #if not pixmap.isNull():
-                    #self.rt_graph_images.insert(0, pixmap)
-                    #self.graph_list.insertItem(0, QtGui.QListWidgetItem(k))
-                    #self.last_rt_graph = k
-                    #while len(self.rt_graph_images) > 200:
-                        #del self.rt_graph_images[200]
-                    #while self.graph_list.count() > 200:
-                        #self.graph_list.takeItem(200)
                 if not self.pause_updating.isChecked() \
                         and not self.running_total.isChecked():
                     image = QtGui.QImage.fromData(rt_graphs[self.last_rt_graph])
@@ -179,3 +147,4 @@ class RealtimeGraphVisualizer(QtGui.QWidget):
         self.graph_display.set_pixmap(pixmap)
         keys = None # Just in case.
         rt_graphs = None # Just in case.
+
