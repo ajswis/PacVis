@@ -24,7 +24,7 @@ if __name__ == '__main__':
     dns_queue = Queue()
     arp_queue = Queue()
     processing.init(rt_graphs, at_graph, dns_dict, pic_queue,
-            filename_queue, dns_queue, arp_queue, interval=6.0, device='wlp3s0')
+            filename_queue, dns_queue, arp_queue, interval=6.0, device='mon0')
 
     app = QtGui.QApplication(sys.argv)
     pacvis = PacVisMainWindow(rt_graphs, at_graph, dns_dict,
