@@ -15,7 +15,8 @@ if __name__ == '__main__':
     rt_graphs = manager.Namespace()
     rt_graphs.dict = OrderedDict()
     at_graph = manager.Namespace()
-    at_graph.graph = ''
+    at_graph.total = ()
+    at_graph.specifics = [() for i in range(6)]
     dns_dict = manager.Namespace()
     dns_dict.dict = OrderedDict()
     pic_queue = Queue()

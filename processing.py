@@ -3,15 +3,6 @@ from multiprocessing.queues import Queue
 from collections import OrderedDict
 import sniffer, re, zlib, hashlib, time, pydot
 
-TRAFFIC_COLORS = {
-    1: 'orange', # ICMP
-    2: 'yellow', # IGMP
-    6: 'red',    # TCP
-    17: 'blue',  # UDP
-    53: 'green', # DNS
-    0x0806: 'purple', # ARP
-}
-
 _initialized = False
 
 def init(rt_graphs, at_graph, dns_dict, pic_queue=Queue(),
@@ -19,7 +10,7 @@ def init(rt_graphs, at_graph, dns_dict, pic_queue=Queue(),
         interval=5.0, device='mon0'):
     global _interval, _rt_graphs, _at_graph, _pic_queue,\
             _filename_queue, _dns, _manager, _traf_dict,\
-            _tcp_parse_queue, _initialized
+            _tcp_parse_queue, _traffic_colors, _initialized
 
     _interval = interval
     _rt_graphs = rt_graphs
@@ -31,6 +22,14 @@ def init(rt_graphs, at_graph, dns_dict, pic_queue=Queue(),
     _manager = Manager()
     _traf_dict = _manager.dict()
     _tcp_parse_queue = Queue()
+
+    _traffic_colors = OrderedDict()
+    _traffic_colors[1] = 'orange' # ICMP
+    _traffic_colors[2] = 'yellow' # IGMP
+    _traffic_colors[6] = 'red'    # TCP
+    _traffic_colors[17] = 'blue'  # UDP
+    _traffic_colors[53] = 'green' # DNS
+    _traffic_colors[0x0806] = 'purple' # ARP
 
     sniffer.init(
             rt_traf_dict = _traf_dict,
@@ -49,7 +48,7 @@ def start():
 
     build_rt_graph = Process(target=_update_graph,
             args=(True,'realtime',_interval))
-    build_at_graph = Process(target=_update_graph, args=(False,'alltime',60))
+    build_at_graph = Process(target=_update_graph, args=(False,'alltime',6))
     parse_tcp = Process(target=_parse_finished_tcp)
     build_rt_graph.start()
     build_at_graph.start()
@@ -128,6 +127,10 @@ def _parse_finished_tcp():
         if len(stream) == 3: # re.split creates ['', name_line, junk] on success
             queue_fname(stream[1])
 
+# It may just be better to seperate realtime and alltime graph generation into
+# different functions.
+# graph_id is used if saving the generated image to differentiate realtime
+# and alltime graphs
 def _update_graph(realtime, graph_id, interval):
     while True:
         time.sleep(interval)
@@ -143,10 +146,18 @@ def _update_graph(realtime, graph_id, interval):
             _rt_graphs.dict = rt_graphs
             rt_graphs = None # Just in case.
         else:
-            _at_graph.graph = (time.strftime('%I:%M:%S'), image)
-        image = None # Just in case.
+            _at_graph.total = (time.strftime('%I:%M:%S'), image)
+            # Omit unknown traffic from specialized graphs.
+            specific_graphs = _at_graph.specifics
+            for i,v in enumerate(_traffic_colors):
+                graph = _convert_dict_to_graph(realtime, (v,))
+                image = graph.create_png(prog='twopi')
+                specific_graphs[i] = (time.strftime('%I:%M:%S'), image)
+            _at_graph.specifics = specific_graphs
 
-def _convert_dict_to_graph(realtime):
+# Take in specific_types as a tuple that way, if I wanted, I could
+# generate graphs of multiple specific connection types.
+def _convert_dict_to_graph(realtime, specific_types=()):
     graph = pydot.Dot(graph_type='digraph', ranksep=3, ratio='auto')
     keys = _traf_dict.keys()
     for ip in keys:
@@ -154,7 +165,7 @@ def _convert_dict_to_graph(realtime):
             src = ip[0]
             dst = ip[1]
             # Get value if exists, else default to black.
-            traffic_type = TRAFFIC_COLORS.get(ip[2], 'black')
+            traffic_type = _traffic_colors.get(ip[2], 'black')
             amount_traffic = _traf_dict[ip] ** (0.5)
             if realtime:
                 if amount_traffic > 0:
@@ -163,6 +174,8 @@ def _convert_dict_to_graph(realtime):
                 else:
                     continue
             else:
+                if specific_types and ip[2] not in specific_types:
+                    continue
                 amount_traffic = 1
             src_node = pydot.Node(src, shape='rectangle')
             dst_node = pydot.Node(dst, shape='rectangle')

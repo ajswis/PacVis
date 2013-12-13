@@ -13,5 +13,4 @@ Libraries Used
 To-Do
 -----
 * Cleanly stop all running processes when the GUI closes or upon shutdown.
-* Include options to display only specific connection types when displaying the alltime total graph.
 * Automatically detect wether scapy needs to parse radiotap headers to find ARP messages or if it can do so by applying a filter (applying a filter while capturing on an interface in monitor mode causes scapy to crash and hang).
