@@ -10,6 +10,8 @@ Libraries Used
 * Pydot
 * PyQt4
 
+Although airmon-ng isn't a library used to run PacVis, it is useful for setting up an interface that PacVis can sniff on.
+
 To-Do
 -----
 * Rename variables to shorter, more concise names.
