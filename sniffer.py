@@ -135,7 +135,7 @@ def _handle_tcp_stream(tcp):
                 pass # Just in case.
         tcp.discard(0)
     elif tcp.nids_state in _END_STATES:
-        _tcp_parse_queue.put((tcp.client.data, tcp.server.data, tcp.addr))
+        _tcp_parse_queue.put((tcp.client.data, tcp.server.data))
         try:
             tcp.discard(tcp.client.count)
             tcp.discard(tcp.server.count)

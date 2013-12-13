@@ -85,46 +85,46 @@ def _parse_finished_tcp():
                     return True
         return False
 
-    def get_content_name(http_dump):
-        name = cname.search(http_dump)
+    def get_content_name(http_get_dump):
+        name = cname.search(http_get_dump)
         if name != None:
             name = name.group().split()[1]
             name = re.sub(r'(\?.*|;.*|&.*)', '', name) # Remove trailing url vars
             if len(name) > 200:
                 name = name[:200]
             return name
-        return 'no_name_'+hashlib.md5(http_dump).hexdigest()
+        return False
 
     def queue_content(data, name, compressed=False):
         if compressed:
             data = zlib.decompress(data, 16+zlib.MAX_WBITS)
-        if len(data) > 4000:
+        if len(data) > 4e3: # 4 KB
             _pic_queue.put(data)
 
     def queue_fname(name):
-        _filename_queue.put(get_content_name(name))
+        name = get_content_name(name)
+        if name:
+            _filename_queue.put(name)
 
     while True:
-        client_data, server_data, conn = _tcp_parse_queue.get()
-        with open('tcp_streams/client-%s:%s-%s:%s'%(conn[0][0],conn[0][1],conn[1][0],conn[1][1]),'w') as f:
-            f.write(client_data)
-        with open('tcp_streams/server-%s:%s-%s:%s'%(conn[1][0],conn[1][1],conn[0][0],conn[0][1]),'w') as f:
-            f.write(server_data)
+        client_data, server_data = _tcp_parse_queue.get()
 
         # Split HTTP responses and combine into matching groups consisting
         # of HTTP return code and remaining HTTP info plus payload.
-        stream = re.split(r'(HTTP/\d.\d\s\d{3}\s.*?\r\n)', client_data, 1)
+        stream = re.split(r'(HTTP/\d.\d\s\d{3}\s.*?\r\n)', client_data)
         stream = [[i,j] for i,j in zip(stream[1::2], stream[2::2])]
         for data in stream:
             try:
-                pkt_info, payload = re.split(r'\r\n.*?\r\n\r\n', data[1], 1)
-                if (stream_returned_ok(data[0]) and
-                        is_wanted_content(pkt_info)):
-                    queue_content(payload, is_compressed(pkt_info))
+                if stream_returned_ok(data[0]):
+                    pkt_info, payload = re.split(r'\r\n\r\n', data[1], 1)
+                    if is_wanted_content(pkt_info):
+                        queue_content(payload, is_compressed(pkt_info))
             except ValueError:
                 pass # re.split doesn't have enough values to unpack
+        # Sometimes request streams will have some data, but it isn't often
+        # enough to really want to parse for it.
         stream = re.split(r'(GET.*?\r\n)', server_data)
-        if len(stream) == 3: # re.split creates ['', name_line, junk] on success
+        for i in stream[1::2]:
             queue_fname(stream[1])
 
 # It may just be better to seperate realtime and alltime graph generation into
