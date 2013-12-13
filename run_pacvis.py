@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 from multiprocessing import Process, Manager
 from multiprocessing.queues import Queue
 from collections import OrderedDict
