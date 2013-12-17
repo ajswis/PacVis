@@ -9,6 +9,8 @@ Libraries Used
 * Scapy
 * Pydot
 * PyQt4
+* Matplotlib
+* Numpy
 
 Although airmon-ng isn't a library used to run PacVis, it is useful for setting up an interface that PacVis can sniff on.
 
